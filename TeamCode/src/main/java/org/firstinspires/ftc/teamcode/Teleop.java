@@ -25,17 +25,18 @@ import java.util.List;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
 import java.util.concurrent.TimeUnit;
-
+import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 
 @TeleOp(name = "Teleop")
 public class Teleop extends LinearOpMode {
 
     private IMU imu;
-
-    private DcMotor Back_right;
-    private DcMotor Front_right;
-    private DcMotor Front_left;
-    private DcMotor Back_left;
+    private GoBildaPinpointDriver pinpoint;
+    private double headingOffset;
+    private DcMotorEx Back_right;
+    private DcMotorEx Front_right;
+    private DcMotorEx Front_left;
+    private DcMotorEx Back_left;
     private DcMotor shooter1;
     private DcMotor shooter2;
     private DcMotorEx intake;
@@ -54,10 +55,10 @@ public class Teleop extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        Back_right = hardwareMap.get(DcMotor.class, "Back_right");
-        Front_right = hardwareMap.get(DcMotor.class, "Front_right");
-        Front_left = hardwareMap.get(DcMotor.class, "Front_left");
-        Back_left = hardwareMap.get(DcMotor.class, "Back_left");
+        Back_right = hardwareMap.get(DcMotorEx.class, "Back_right");
+        Front_right = hardwareMap.get(DcMotorEx.class, "Front_right");
+        Front_left = hardwareMap.get(DcMotorEx.class, "Front_left");
+        Back_left = hardwareMap.get(DcMotorEx.class, "Back_left");
 
         intake = hardwareMap.get(DcMotorEx.class, "intake");
 
@@ -68,6 +69,8 @@ public class Teleop extends LinearOpMode {
         operator = gamepad2;
 
         imu = hardwareMap.get(IMU.class, "imu");
+
+        pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
 
         /*
         // Create the AprilTag processor
@@ -165,42 +168,40 @@ public class Teleop extends LinearOpMode {
 
     }
 
-    private void Orient() {
-        double y = driver.left_stick_y;
-        double x = driver.left_stick_x;
-        direction = -driver.right_stick_x;
-
-        double heading = -imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
-
-        dx = x * Math.cos(-heading) - y * Math.sin(-heading);
-        dy = x * Math.sin(-heading) + y * Math.cos(-heading);
-
-        if (driver.a && !previousA) {
-            imu.resetYaw();
-        }
-        previousA = driver.a;
-
-    }
-
     private void DumbTrain() {
         float Strafe;
         float Turn;
         float forward;
         double denominator;
 
-        Turn = -driver.right_stick_x;
+        Turn = driver.right_stick_x;
         Strafe = driver.left_stick_x;
         forward = driver.left_stick_y;
         forward = forward * 1f;
         denominator = JavaUtil.maxOfList(JavaUtil.createListWith(1, Turn + forward + Strafe));
-        Back_left.setPower((forward + (Strafe - Turn)) * denominator);
-        Front_left.setPower((forward - (Strafe + Turn)) * denominator);
-        Back_right.setPower((forward - (Strafe - Turn)) * denominator);
-        Front_right.setPower((forward + Strafe + Turn) * denominator);
+        Back_left.setVelocity((forward + (Strafe - Turn)) * denominator * 2000);
+        Front_left.setVelocity((forward - (Strafe + Turn)) * denominator * 2000);
+        Back_right.setVelocity((forward - (Strafe - Turn)) * denominator * 2000);
+        Front_right.setVelocity((forward + Strafe + Turn) * denominator * 2000);
     }
 
     private void DriveTrain() {
-        Orient();
+
+        double y = driver.left_stick_y;
+        double x = driver.left_stick_x;
+        direction = driver.right_stick_x;
+
+        //double heading = -imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+        double heading = pinpoint.getHeading(AngleUnit.RADIANS);
+
+        if (driver.a && !previousA) {
+            imu.resetYaw();
+        }
+        previousA = driver.a;
+
+        dx = x * Math.cos(-heading) - y * Math.sin(-heading);
+        dy = x * Math.sin(-heading) + y * Math.cos(-heading);
+
         double denominator = JavaUtil.maxOfList(JavaUtil.createListWith(1, direction + dy + dx));
         Back_left.setPower((dy + (dx - direction)) * denominator);
         Front_left.setPower((dy - (dx + direction)) * denominator);
