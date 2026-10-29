@@ -44,11 +44,7 @@ public class Teleop extends LinearOpMode {
     //private AprilTagProcessor aprilTag;
     private boolean previousA = false;
     ElapsedTime tick = new ElapsedTime();
-    private double angle;
-    private double direction;
-    private double dx;
-    private double dy;
-
+    private double angleOffset = 0;
     private Gamepad driver;
     private Gamepad operator;
 
@@ -71,6 +67,11 @@ public class Teleop extends LinearOpMode {
         imu = hardwareMap.get(IMU.class, "imu");
 
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
+
+        pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
+        pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
+
+        //pinpoint.resetPosAndIMU();
 
         /*
         // Create the AprilTag processor
@@ -126,10 +127,11 @@ public class Teleop extends LinearOpMode {
 
         if (opModeIsActive()) {
             while (opModeIsActive()) {
-                DumbTrain();
+                DriveTrain();
                 Shooter();
                 Telemetry();
                 Intake();
+                pinpoint.update();
             }
         }
     }
@@ -168,39 +170,45 @@ public class Teleop extends LinearOpMode {
 
     }
 
+    private void TankDrive() {
+        Back_left.setPower(driver.left_stick_y);
+        Front_left.setPower(driver.left_stick_y);
+        Front_right.setPower(driver.left_stick_y);
+        Back_right.setPower(driver.left_stick_y);
+    }
+
     private void DumbTrain() {
         float Strafe;
         float Turn;
         float forward;
         double denominator;
 
-        Turn = driver.right_stick_x;
+        Turn = driver.right_stick_x * 0.8f;
         Strafe = driver.left_stick_x;
         forward = driver.left_stick_y;
-        forward = forward * 1f;
         denominator = JavaUtil.maxOfList(JavaUtil.createListWith(1, Turn + forward + Strafe));
-        Back_left.setVelocity((forward + (Strafe - Turn)) * denominator * 2000);
-        Front_left.setVelocity((forward - (Strafe + Turn)) * denominator * 2000);
-        Back_right.setVelocity((forward - (Strafe - Turn)) * denominator * 2000);
-        Front_right.setVelocity((forward + Strafe + Turn) * denominator * 2000);
+        Back_left.setPower((forward + (Strafe - Turn)) * denominator);
+        Front_left.setPower((forward - (Strafe + Turn)) * denominator);
+        Back_right.setPower((forward - (Strafe - Turn)) * denominator);
+        Front_right.setPower((forward + Strafe + Turn) * denominator);
     }
 
     private void DriveTrain() {
 
         double y = driver.left_stick_y;
         double x = driver.left_stick_x;
-        direction = driver.right_stick_x;
+        double direction = driver.right_stick_x * 0.5f;
 
         //double heading = -imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
-        double heading = pinpoint.getHeading(AngleUnit.RADIANS);
+        double heading = -pinpoint.getHeading(AngleUnit.RADIANS) - angleOffset;
 
         if (driver.a && !previousA) {
-            imu.resetYaw();
+            angleOffset = -pinpoint.getHeading(AngleUnit.RADIANS);
         }
         previousA = driver.a;
 
-        dx = x * Math.cos(-heading) - y * Math.sin(-heading);
-        dy = x * Math.sin(-heading) + y * Math.cos(-heading);
+        double dx = x * Math.cos(-heading) - y * Math.sin(-heading);
+        double dy = x * Math.sin(-heading) + y * Math.cos(-heading);
 
         double denominator = JavaUtil.maxOfList(JavaUtil.createListWith(1, direction + dy + dx));
         Back_left.setPower((dy + (dx - direction)) * denominator);
@@ -214,6 +222,8 @@ public class Teleop extends LinearOpMode {
         telemetry.addData("BACK_RIGHT", Back_right.getPower());
         telemetry.addData("FRONT_RIGHT", Front_right.getPower());
         telemetry.addData("FRONT_LEFT", Front_left.getPower());
+
+        telemetry.addData("Heading", -pinpoint.getHeading(AngleUnit.DEGREES));
 
         //List<AprilTagDetection> currentDetections = aprilTag.getDetections();
 
