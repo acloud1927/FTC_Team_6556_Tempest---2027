@@ -31,16 +31,15 @@ public class DriveTrain {
         this.pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
         this.pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
 
+        this.Front_right.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        this.Front_left.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        this.Back_left.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        this.Back_right.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         this.Back_right.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         this.Front_right.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         this.Front_left.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         this.Back_left.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        this.Front_right.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        this.Front_left.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        this.Back_left.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        this.Back_right.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         this.Back_left.setDirection(DcMotor.Direction.REVERSE);
         this.Front_left.setDirection(DcMotor.Direction.REVERSE);
