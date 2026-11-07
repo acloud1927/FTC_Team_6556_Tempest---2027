@@ -72,4 +72,21 @@ public class DriveTrain {
         this.Front_right.setPower((dy + dx + direction) * denominator);
     }
 
+    public void MechanumSimple() {
+        float Strafe;
+        float Turn;
+        float forward;
+        double denominator;
+
+        Turn = gamepad.right_stick_x;
+        Strafe = -gamepad.left_stick_x;
+        forward = gamepad.left_stick_y;
+        denominator = JavaUtil.maxOfList(JavaUtil.createListWith(1, Turn + forward + Strafe));
+        Back_left.setPower((forward + (-Strafe - Turn)) * denominator);
+        Front_left.setPower((forward - (-Strafe + Turn)) * denominator);
+        Back_right.setPower((forward - (Strafe - Turn)) * denominator);
+        Front_right.setPower((forward + Strafe + Turn) * denominator);
+    }
+
+
 }

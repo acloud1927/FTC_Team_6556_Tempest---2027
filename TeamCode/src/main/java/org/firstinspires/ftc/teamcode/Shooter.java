@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 //import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -17,8 +18,8 @@ public class Shooter {
 
         this.gamepad = gamepad;
 
-        this.shooter1.setDirection(DcMotor.Direction.FORWARD);
-        this.shooter2.setDirection(DcMotor.Direction.REVERSE);
+        this.shooter1.setDirection(DcMotor.Direction.REVERSE);
+        this.shooter2.setDirection(DcMotor.Direction.FORWARD);
     }
 
     public void Simple() {

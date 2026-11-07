@@ -27,7 +27,7 @@ public class Teleop extends LinearOpMode {
     private DriveTrain driveTrain;
     private Shooter shooter;
     private Intake intake;
-
+    private Turret turret;
 
     @Override
     public void runOpMode() {
@@ -54,10 +54,15 @@ public class Teleop extends LinearOpMode {
 
         intake = new Intake(
                 hardwareMap.get(DcMotorEx.class, "intake"),
+                hardwareMap.get(Servo.class, "right_blocker"),
+                hardwareMap.get(Servo.class, "left_blocker"),
                 operator
         );
 
-
+        turret = new Turret(
+                hardwareMap.get(DcMotor.class, "turret"),
+                operator
+        );
 
 
         /*
@@ -89,9 +94,10 @@ public class Teleop extends LinearOpMode {
 
         if (opModeIsActive()) {
             while (opModeIsActive()) {
-                driveTrain.Mechanum();
+                driveTrain.MechanumSimple();
                 shooter.Simple();
                 intake.Simple();
+                turret.Simple();
                 Telemetry();
             }
         }
