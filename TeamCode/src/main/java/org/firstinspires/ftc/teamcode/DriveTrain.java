@@ -16,7 +16,9 @@ public class DriveTrain {
     public DcMotorEx Back_left;
     private boolean previousA = false;
     private Gamepad gamepad;
-    private double angleOffset = 0;
+    public double desiredHeading = 0;
+    public double angleOffset = 0;
+    public double direction = 0;
 
     public DriveTrain(DcMotorEx Back_right, DcMotorEx Front_right, DcMotorEx Back_left, DcMotorEx Front_left, Gamepad gamepad, GoBildaPinpointDriver pinpoint) {
         this.Back_right = Back_right;
@@ -46,18 +48,18 @@ public class DriveTrain {
 
     }
 
-    public void Mechanum() {
+    public void MechanumDriverCentric() {
 
         this.pinpoint.update();
 
         double y = gamepad.left_stick_y;
-        double x = gamepad.left_stick_x;
-        double direction = gamepad.right_stick_x * 0.5f;
+        double x = -gamepad.left_stick_x;
+        double direction = gamepad.right_stick_x;
 
-        double heading = -this.pinpoint.getHeading(AngleUnit.RADIANS) - angleOffset;
+        double heading = this.pinpoint.getHeading(AngleUnit.RADIANS) - angleOffset;
 
         if (gamepad.a && !this.previousA) {
-            this.angleOffset = -this.pinpoint.getHeading(AngleUnit.RADIANS);
+            this.angleOffset = this.pinpoint.getHeading(AngleUnit.RADIANS);
         }
         this.previousA = gamepad.a;
 
@@ -66,10 +68,41 @@ public class DriveTrain {
 
         double denominator = JavaUtil.maxOfList(JavaUtil.createListWith(1, direction + dy + dx));
 
-        this.Back_left.setPower((dy + (dx - direction)) * denominator);
-        this.Front_left.setPower((dy - (dx + direction)) * denominator);
+        this.Back_left.setPower((dy + (-dx - direction)) * denominator);
+        this.Front_left.setPower((dy - (-dx + direction)) * denominator);
         this.Back_right.setPower((dy - (dx - direction)) * denominator);
         this.Front_right.setPower((dy + dx + direction) * denominator);
+    }
+
+    public void MechanumHeadingLock() {
+
+        this.pinpoint.update();
+
+        double heading = this.pinpoint.getHeading(AngleUnit.RADIANS) - this.angleOffset;
+
+        if (gamepad.a && !this.previousA) {
+            this.angleOffset = this.pinpoint.getHeading(AngleUnit.RADIANS);
+        }
+        this.previousA = gamepad.a;
+
+        double y = gamepad.left_stick_y;
+        double x = -gamepad.left_stick_x;
+        //this.desiredHeading += gamepad.right_stick_x * 0.01;
+//        if (Math.abs((this.desiredHeading-this.angleOffset) - heading) < 5) {
+//            this.direction = 0;
+//        }
+        this.direction = 10 * (heading + Math.pow(this.desiredHeading - this.angleOffset, 3));
+
+
+        double dx = x * Math.cos(-heading) - y * Math.sin(-heading);
+        double dy = x * Math.sin(-heading) + y * Math.cos(-heading);
+
+        double denominator = JavaUtil.maxOfList(JavaUtil.createListWith(1, this.direction + dy + dx));
+
+        this.Back_left.setPower((dy + (-dx - this.direction)) * denominator);
+        this.Front_left.setPower((dy - (-dx + this.direction)) * denominator);
+        this.Back_right.setPower((dy - (dx - this.direction)) * denominator);
+        this.Front_right.setPower((dy + dx + this.direction) * denominator);
     }
 
     public void MechanumSimple() {

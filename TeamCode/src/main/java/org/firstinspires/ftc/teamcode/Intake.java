@@ -34,12 +34,12 @@ public class Intake {
             this.intake.setPower(0);
         }
 
-        if (gamepad.a) {
+        if (gamepad.y) {
             this.rightBlocker.setPosition(0.3);
             this.leftBlocker.setPosition(0);
         } else if (gamepad.b) {
-            this.rightBlocker.setPosition(0.1);
-            this.leftBlocker.setPosition(0.2);
+            this.rightBlocker.setPosition(0.13);
+            this.leftBlocker.setPosition(0.17);
         } else {
             this.rightBlocker.setPosition(0);
             this.leftBlocker.setPosition(0.3);

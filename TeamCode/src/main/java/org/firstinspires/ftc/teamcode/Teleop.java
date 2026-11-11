@@ -35,7 +35,7 @@ public class Teleop extends LinearOpMode {
         // private VisionPortal visionPortal;
         //private AprilTagProcessor aprilTag;
         Gamepad driver = gamepad1;
-        Gamepad operator = gamepad2;
+        Gamepad operator = gamepad1;
 
         driveTrain = new DriveTrain(
                 hardwareMap.get(DcMotorEx.class, "Back_right"),
@@ -47,8 +47,8 @@ public class Teleop extends LinearOpMode {
         );
 
         shooter = new Shooter(
-                hardwareMap.get(DcMotor.class, "shooter1"),
-                hardwareMap.get(DcMotor.class, "shooter2"),
+                hardwareMap.get(DcMotorEx.class, "shooter1"),
+                hardwareMap.get(DcMotorEx.class, "shooter2"),
                 operator
         );
 
@@ -61,6 +61,8 @@ public class Teleop extends LinearOpMode {
 
         turret = new Turret(
                 hardwareMap.get(DcMotor.class, "turret"),
+                hardwareMap.get(Servo.class, "right_hood"),
+                hardwareMap.get(Servo.class, "left_hood"),
                 operator
         );
 
@@ -94,7 +96,7 @@ public class Teleop extends LinearOpMode {
 
         if (opModeIsActive()) {
             while (opModeIsActive()) {
-                driveTrain.MechanumSimple();
+                driveTrain.MechanumHeadingLock();
                 shooter.Simple();
                 intake.Simple();
                 turret.Simple();
@@ -119,12 +121,13 @@ public class Teleop extends LinearOpMode {
         telemetry.addData("Front_Right", driveTrain.Front_right.getPower());
         telemetry.addData("Front_Left", driveTrain.Front_left.getPower());
 
-        telemetry.addData("Heading", -driveTrain.pinpoint.getHeading(AngleUnit.DEGREES));
+        telemetry.addData("Heading", driveTrain.pinpoint.getHeading(AngleUnit.DEGREES) - driveTrain.angleOffset);
+        //telemetry.addData("Desired Heading", 0.01 * (driveTrain.desiredHeading - driveTrain.angleOffset));
+        telemetry.addData("Direction", driveTrain.direction);
 
         telemetry.addData("Intake", intake.intake.getPower());
 
-        telemetry.addData("Shooter1 RPM", shooter.shooter1.getPower());
-        telemetry.addData("Shooter2 RPM", shooter.shooter2.getPower());
+        telemetry.addData("Shooter RPM", shooter.shooter1.getVelocity());
 
         //List<AprilTagDetection> currentDetections = aprilTag.getDetections();
 
