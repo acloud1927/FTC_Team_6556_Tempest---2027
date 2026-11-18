@@ -1,10 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotor;
-//import org.firstinspires.ftc.robotcore.external.JavaUtil;
 
 public class Shooter {
 
@@ -26,8 +23,8 @@ public class Shooter {
         if (gamepad.left_trigger > 0) {
             //this.shooter1.setPower(0.6);
             //this.shooter2.setPower(0.6);
-            this.shooter1.setVelocity(2100);
-            this.shooter2.setVelocity(2100);
+            this.shooter1.setVelocity(2200);
+            this.shooter2.setVelocity(2200);
         } else if (gamepad.left_bumper) {
             //this.shooter1.setPower(-0.4);
             //this.shooter2.setPower(-0.4);

@@ -87,7 +87,7 @@ public class DriveTrain {
 
         double y = gamepad.left_stick_y;
         double x = -gamepad.left_stick_x;
-        //this.desiredHeading += gamepad.right_stick_x * 0.01;
+        this.desiredHeading += gamepad.right_stick_x * 0.01;
 //        if (Math.abs((this.desiredHeading-this.angleOffset) - heading) < 5) {
 //            this.direction = 0;
 //        }
